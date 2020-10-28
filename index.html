@@ -1,0 +1,139 @@
+<html>
+<canvas id="gameCanvas" width="1200" height="800">
+</canvas>
+
+<script src="keydrown.js">
+</script>
+
+<script>
+    var canvas;
+    var canvasContext;
+
+    var fps = 144;
+
+    var playerBase = {
+        x: 0,
+        y: 0,
+        w: 23,
+        h: 23
+    }
+    var apple = Object.create(playerBase);
+    var length = 5;
+
+    var movFactor = 0;
+
+    var array = [];
+
+    window.onload = function () {
+
+        console.log("Working :D");
+        canvas = document.getElementById('gameCanvas');
+        canvasContext = canvas.getContext('2d');
+
+        playerBase.x = canvas.width / 2 - playerBase.w / 2;
+        playerBase.y = canvas.height / 2 - playerBase.h / 2;
+        setUpArray();
+        newPlayer = Object.create(playerBase);
+
+        console.log(array.length);
+
+        kd.W.down(function () {
+            if (movFactor != 2) movFactor = 1; // 1 is up
+        })
+        kd.S.down(function () {
+            if (movFactor != 1) movFactor = 2; // 2 is down
+        })
+        kd.A.down(function () {
+            if (movFactor != 4) movFactor = 3; // 3 is left
+        })
+        kd.D.down(function () {
+            if (movFactor != 3) movFactor = 4; // 4 is right
+        })
+        drawNewApple();
+        setInterval(drawEverything, 1000 / fps);
+    }
+
+
+
+    function drawEverything() {
+        kd.tick();
+        drawBackground();
+        drawApple();
+        drawPlayer();
+        movePlayer();
+        checkApple();
+    }
+
+    function drawBackground() {
+        canvasContext.fillStyle = 'black';
+        canvasContext.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function drawNewApple(){
+        apple.x = getRndInteger(0, canvas.width - apple.w);
+        apple.y = getRndInteger(0, canvas.height- apple.w);
+    }
+
+    function drawApple(){
+        p = apple;
+        canvasContext.fillStyle = 'red';
+            canvasContext.fillRect(p.x, p.y, p.w, p.h);
+    }
+
+    function checkApple(){
+        if (Math.abs(apple.x - array[0].x) < apple.w && Math.abs(apple.y - array[0].y) < apple.w){
+            length++;
+            drawNewApple();
+        }
+        
+    }
+
+    function drawPlayer() {
+        //console.log(array.length)
+        array.slice(0, length * playerBase.w).forEach(p => {
+            canvasContext.fillStyle = 'green';
+            canvasContext.fillRect(p.x, p.y, p.w, p.h);
+        });
+        array.length = length * playerBase.w + playerBase.w;
+    }
+
+    function movePlayer() {
+        switch (movFactor) {
+            case 1:
+            pushPlayer = Object.create(array[0])
+            pushPlayer.y = array[0].y - 1;
+                break;
+            case 2:
+            pushPlayer = Object.create(array[0])
+            pushPlayer.y = array[0].y + 1;
+                break;
+            case 3:
+            pushPlayer = Object.create(array[0])
+            pushPlayer.x = array[0].x - 1;
+                break;
+            case 4:
+            pushPlayer = Object.create(array[0])
+            pushPlayer.x = array[0].x + 1;
+                break;
+
+            default:
+                break;
+        }
+    array.unshift(pushPlayer);
+    }
+
+    function setUpArray() {
+        for (var i = 0; i < length * playerBase.w; i++) {
+            array.push(playerBase);
+        }
+    }
+
+
+
+
+    function getRndInteger(min, max) {
+  return Math.floor(Math.random() * (max - min) ) + min;
+}
+</script>
+
+</html>
